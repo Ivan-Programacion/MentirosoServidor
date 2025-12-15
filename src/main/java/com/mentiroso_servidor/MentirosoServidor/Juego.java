@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 public class Juego {
 	private ArrayList<Partida> listaPartida;
+	
+	public Juego() {
+		listaPartida = new ArrayList<>();
+	}
 
 	public ArrayList<Partida> getListaPartida() {
 		return listaPartida;
