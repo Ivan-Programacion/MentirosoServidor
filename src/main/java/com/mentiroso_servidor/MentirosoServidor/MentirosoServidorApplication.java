@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MentirosoServidorApplication {
 
-	Juego juego = new Juego(); // Iniciamos el juego con el arranque del servidor
+	private static int idPartidas = 0;
 	
 	public static void main(String[] args) {
+		Juego juego = new Juego(); // Iniciamos el juego con el arranque del servidor
 		SpringApplication.run(MentirosoServidorApplication.class, args);
 
 	}
@@ -25,5 +26,12 @@ public class MentirosoServidorApplication {
 	public String conexion() {
 		return "Conexión establecida";
 	}
+	
+	@GetMapping("/crear")
+	public String crear() {
+//		Partida partida = new Partida(0, );
+		return "";
+	}
+
 
 }

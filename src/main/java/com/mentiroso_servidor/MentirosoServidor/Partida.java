@@ -1,14 +1,32 @@
 package com.mentiroso_servidor.MentirosoServidor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Partida {
 	private int id;
 	private int idJugadorActual;
 	private int rondas;
-	private HashMap<String, ArrayList<String>[]> baraja;
+	private HashMap<String, ArrayList<String>> baraja;
 	private ArrayList<Jugador> jugadores;
+
+	public Partida(int id, int idJugadorActual) {
+		this.id = id;
+		this.idJugadorActual = idJugadorActual;
+		rondas = 1;
+		baraja = new HashMap<>();
+		jugadores = new ArrayList<>();
+	}
+
+	public void crearBaraja() {
+		String[] listaCartas = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
+		ArrayList<String> cartas = new ArrayList<>(Arrays.asList(listaCartas));
+		baraja.put("picas", cartas);
+		baraja.put("treboles", cartas);
+		baraja.put("corazones", cartas);
+		baraja.put("diamantes", cartas);
+	}
 
 	public int getId() {
 		return id;
@@ -34,11 +52,11 @@ public class Partida {
 		this.rondas = rondas;
 	}
 
-	public HashMap<String, ArrayList<String>[]> getBaraja() {
+	public HashMap<String, ArrayList<String>> getBaraja() {
 		return baraja;
 	}
 
-	public void setBaraja(HashMap<String, ArrayList<String>[]> baraja) {
+	public void setBaraja(HashMap<String, ArrayList<String>> baraja) {
 		this.baraja = baraja;
 	}
 

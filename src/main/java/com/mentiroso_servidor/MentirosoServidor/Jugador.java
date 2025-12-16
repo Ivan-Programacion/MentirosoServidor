@@ -1,12 +1,11 @@
 package com.mentiroso_servidor.MentirosoServidor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Jugador {
 	private int id;
 	private String nombre;
-	private ArrayList<String>[] mano;
+	private ArrayList<String> mano;
 
 	public int getId() {
 		return id;
@@ -24,16 +23,17 @@ public class Jugador {
 		this.nombre = nombre;
 	}
 
-	public ArrayList<String>[] getMano() {
+	public ArrayList<String> getMano() {
 		return mano;
 	}
 
-	public void setMano(ArrayList<String>[] mano) {
+	public void setMano(ArrayList<String> mano) {
 		this.mano = mano;
 	}
 
 	@Override
 	public String toString() {
-		return "Jugador [id=" + id + ", nombre=" + nombre + ", mano=" + Arrays.toString(mano) + "]";
+		return "Jugador [id=" + id + ", nombre=" + nombre + ", mano=" + mano + "]";
 	}
+
 }
