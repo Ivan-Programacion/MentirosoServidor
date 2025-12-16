@@ -33,13 +33,17 @@ public class MentirosoServidorApplication {
 
 	@GetMapping("/crearPartida/{unNombre}")
 	public String crearPartida(@PathVariable String unNombre) {
-		Jugador jugador = new Jugador(unNombre);
 		int numeroPartida = juego.numeroPartidas() + 1;
 		Partida partida = new Partida(numeroPartida);
 		partida.crearBaraja();
+		int numeroJugador = partida.numJugadores() + 1;
+		Jugador jugador = new Jugador(unNombre, numeroJugador);
 		repartirCartas(partida, jugador);
 		juego.addPartida(partida);
-		return "Mano del jugador";
+		partida.addJugador(jugador);
+		String cartasJugador = String.join(",", jugador.getMano());
+		String respuestaServidor = numeroJugador + "," + cartasJugador;
+		return respuestaServidor;
 
 	}
 
@@ -61,7 +65,7 @@ public class MentirosoServidorApplication {
 
 					String valor = entry.getValue().get(numeroAleatorio);
 					if (!valor.equals("0")) {
-						j.getMano().add(paloEscogido);
+						j.getMano().add(valor);
 						entry.getValue().set(numeroAleatorio, "0");
 						contador++;
 					}

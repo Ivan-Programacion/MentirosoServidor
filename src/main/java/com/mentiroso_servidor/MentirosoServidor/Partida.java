@@ -28,6 +28,14 @@ public class Partida {
 		baraja.put("corazones", cartas);
 		baraja.put("diamantes", cartas);
 	}
+	
+	public int numJugadores() {
+		return jugadores.size();
+	}
+	
+	public void addJugador(Jugador j) {
+		jugadores.add(j);
+	}
 
 //	public String repartirCartas() {
 //		Random random = new Random();
