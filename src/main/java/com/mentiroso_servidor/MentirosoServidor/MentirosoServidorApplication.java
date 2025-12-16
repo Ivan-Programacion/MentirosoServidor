@@ -23,7 +23,7 @@ public class MentirosoServidorApplication {
 	
 	@GetMapping("/conexion")
 	public String conexion() {
-		return juego.getListaPartida().toString();
+		return "Conexión establecida";
 	}
 
 }
