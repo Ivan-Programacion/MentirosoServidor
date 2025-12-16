@@ -7,6 +7,10 @@ public class Jugador {
 	private String nombre;
 	private ArrayList<String> mano;
 
+	public Jugador(String nombre) {
+		this.nombre = nombre;
+	}
+
 	public int getId() {
 		return id;
 	}
