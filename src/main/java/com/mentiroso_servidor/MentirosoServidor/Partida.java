@@ -3,9 +3,6 @@ package com.mentiroso_servidor.MentirosoServidor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 
 public class Partida {
 	private int id;
@@ -22,47 +19,23 @@ public class Partida {
 
 	public void crearBaraja() {
 		String[] listaCartas = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-		ArrayList<String> cartas = new ArrayList<>(Arrays.asList(listaCartas));
-		baraja.put("picas", cartas);
-		baraja.put("treboles", cartas);
-		baraja.put("corazones", cartas);
-		baraja.put("diamantes", cartas);
+		ArrayList<String> cartasP = new ArrayList<>(Arrays.asList(listaCartas));
+		ArrayList<String> cartasT = new ArrayList<>(Arrays.asList(listaCartas));
+		ArrayList<String> cartasC = new ArrayList<>(Arrays.asList(listaCartas));
+		ArrayList<String> cartasD = new ArrayList<>(Arrays.asList(listaCartas));
+		baraja.put("picas", cartasP);
+		baraja.put("treboles", cartasT);
+		baraja.put("corazones", cartasC);
+		baraja.put("diamantes", cartasD);
 	}
-	
+
 	public int numJugadores() {
 		return jugadores.size();
 	}
-	
+
 	public void addJugador(Jugador j) {
 		jugadores.add(j);
 	}
-
-//	public String repartirCartas() {
-//		Random random = new Random();
-//
-//		int contador = 0;
-//		String mano = "";
-//		while (contador < 5) {
-//
-//			String[] listaPalos = { "picas", "treboles", "corazones", "diamantes" };
-//			int paloAleatorio = random.nextInt(4);
-//			String paloEscogido = listaPalos[paloAleatorio];
-//
-//			for (Entry<String, ArrayList<String>> entry : baraja.entrySet()) {
-//				String clave = entry.getKey();
-//
-//				if (clave.equals(paloEscogido)) {
-//					int numeroAleatorio = random.nextInt(entry.getValue().size());
-//
-//					if (!entry.getValue().get(numeroAleatorio).equals("0")) {
-//						mano += entr
-//					}
-//				}
-//			}
-//			contador++;
-//		}
-//		return "";
-//	}
 
 	public int getId() {
 		return id;
