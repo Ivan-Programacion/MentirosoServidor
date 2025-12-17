@@ -39,33 +39,61 @@ public class MentirosoServidorApplication {
 		int numeroJugador = partida.numJugadores() + 1;
 		Jugador jugador = new Jugador(unNombre, numeroJugador);
 		repartirCartas(partida, jugador);
-		juego.addPartida(partida);
 		partida.addJugador(jugador);
+		juego.addPartida(partida);
 		String cartasJugador = String.join(",", jugador.getMano());
-		String respuestaServidor = numeroJugador + "," + cartasJugador;
+		String respuestaServidor = numeroJugador + ":" + cartasJugador + "," + numeroPartida;
+		System.out.println(juego.toString()); // PRUEBA --------------------------------------------------------------
 		return respuestaServidor;
 
 	}
 
-	public void repartirCartas(Partida p, Jugador j) {
-		Random random = new Random();
+	@GetMapping("/unir/{nombre}/{idPartida}")
+	public String unir(@PathVariable String nombre, @PathVariable int idPartida) {
+		String mensaje = "-1";
+		if (!juego.getListaPartida().isEmpty() && juego.getListaPartida() != null) {
+			for (Partida partida : juego.getListaPartida()) {
+				if (partida.getId() != idPartida)
+					mensaje = "-1";
+				else if (partida.getRondas() > 1)
+					return "-2"; // Devolvemos el valor a la función para que no siga buscando más
+				else if (partida.getJugadores().size() == 5)
+					return "-3";
+				else {
+					Jugador jugador = new Jugador(nombre, partida.numJugadores() + 1);
+					repartirCartas(partida, jugador);
+					partida.addJugador(jugador);
+					String cartasJugador = String.join(",", jugador.getMano());
+					String jugadores = "";
+					for (int i = 0; i < partida.getJugadores().size(); i++) {
+						if (i == partida.getJugadores().size() - 1)
+							jugadores += partida.getJugadores().get(i).getNombre() + ":";
+						else
+							jugadores += partida.getJugadores().get(i).getNombre() + ",";
+					}
+					System.out.println(juego.toString()); // PRUEBA --------------------------------------------------------------
+					return jugadores + cartasJugador; // Devolvemos el valor a la función para que no siga buscando más
+				}
+			}
+		}
+		return mensaje;
+	}
 
+	// MÉTODOS NO MAPPEADOS
+	public void repartirCartas(Partida partida, Jugador jugador) {
+		Random random = new Random();
 		int contador = 0;
 		while (contador < 5) {
-
 			String[] listaPalos = { "picas", "treboles", "corazones", "diamantes" };
 			int paloAleatorio = random.nextInt(4);
 			String paloEscogido = listaPalos[paloAleatorio];
-
-			for (Entry<String, ArrayList<String>> entry : p.getBaraja().entrySet()) {
+			for (Entry<String, ArrayList<String>> entry : partida.getBaraja().entrySet()) {
 				String clave = entry.getKey();
-
 				if (clave.equals(paloEscogido)) {
 					int numeroAleatorio = random.nextInt(entry.getValue().size());
-
 					String valor = entry.getValue().get(numeroAleatorio);
 					if (!valor.equals("0")) {
-						j.getMano().add(valor);
+						jugador.getMano().add(valor);
 						entry.getValue().set(numeroAleatorio, "0");
 						contador++;
 					}
