@@ -80,18 +80,18 @@ public class MentirosoServidorApplication {
 		return mensaje;
 	}
 
-	@GetMapping("/comprobarTurno/{id}")
+	@GetMapping("/comprobarTurno/{id}/{idPartida}")
 	private String comprobarTurno(@PathVariable int id, @PathVariable int idPartida) {
 		String mensaje = null;
 		for (Partida partida : juego.getListaPartida()) {
 			if (partida.getId() == idPartida) {
 				if (id == partida.getIdActual()) {
 					int numJugadores = partida.getJugadores().size();
-					mensaje = "0:" + numJugadores;
+					mensaje = "0:" + numJugadores + "," + partida.getRondas();
 				} else {
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
-							mensaje = jugador.getNombre();
+							mensaje ="-1:" + jugador.getNombre();
 
 						}
 					}
