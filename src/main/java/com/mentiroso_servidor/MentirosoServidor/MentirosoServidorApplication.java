@@ -71,7 +71,8 @@ public class MentirosoServidorApplication {
 						else
 							jugadores += partida.getJugadores().get(i).getNombre() + ",";
 					}
-					System.out.println(juego.toString()); // PRUEBA --------------------------------------------------------------
+					System.out.println(juego.toString()); // PRUEBA
+															// --------------------------------------------------------------
 					return jugadores + cartasJugador; // Devolvemos el valor a la función para que no siga buscando más
 				}
 			}
@@ -79,7 +80,30 @@ public class MentirosoServidorApplication {
 		return mensaje;
 	}
 
+	@GetMapping("/comprobarTurno/{id}/{idPartida}")
+	private String comprobarTurno(@PathVariable int id, @PathVariable int idPartida) {
+		String mensaje = null;
+		for (Partida partida : juego.getListaPartida()) {
+			if (partida.getId() == idPartida) {
+				if (id == partida.getIdActual()) {
+					int numJugadores = partida.getJugadores().size();
+					mensaje = "0:" + numJugadores + "," + partida.getRondas();
+				} else {
+					for (Jugador jugador : partida.getJugadores()) {
+						if (partida.getIdActual() == jugador.getId()) {
+							mensaje ="-1:" + jugador.getNombre();
+
+						}
+					}
+				}
+			}
+		}
+		return mensaje;
+
+	}
+
 	// MÉTODOS NO MAPPEADOS
+
 	public void repartirCartas(Partida partida, Jugador jugador) {
 		Random random = new Random();
 		int contador = 0;
