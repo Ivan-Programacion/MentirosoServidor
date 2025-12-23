@@ -9,12 +9,14 @@ public class Partida {
 	private int rondas;
 	private HashMap<String, ArrayList<String>> baraja;
 	private ArrayList<Jugador> jugadores;
+	private int idActual;
 
 	public Partida(int id) {
 		this.id = id;
 		rondas = 1;
 		baraja = new HashMap<>();
 		jugadores = new ArrayList<>();
+		idActual = 1;
 	}
 
 	public void crearBaraja() {
@@ -67,6 +69,14 @@ public class Partida {
 
 	public void setJugadores(ArrayList<Jugador> jugadores) {
 		this.jugadores = jugadores;
+	}
+
+	public int getIdActual() {
+		return idActual;
+	}
+
+	public void setIdActual(int idActual) {
+		this.idActual = idActual;
 	}
 
 	@Override
