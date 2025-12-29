@@ -91,7 +91,7 @@ public class MentirosoServidorApplication {
 				} else {
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
-							mensaje ="-1:" + jugador.getNombre();
+							mensaje = "-1:" + jugador.getNombre();
 
 						}
 					}
@@ -100,6 +100,110 @@ public class MentirosoServidorApplication {
 		}
 		return mensaje;
 
+	}
+
+	@GetMapping("/jugar/{idPartida}/{idJugador}/{tipo}/{valores}")
+	public String jugar(@PathVariable int idPartida, @PathVariable int idJugador, @PathVariable String tipo,
+			@PathVariable String valores) {
+
+		// Buscamos la partida
+		for (Partida partida : juego.getListaPartida()) {
+			if (partida.getId() == idPartida) {
+
+				// Vemos si es el turno del jugador, si no devolvemos -1
+				if (partida.getIdActual() != idJugador) {
+					return "-1";
+				}
+
+				// Buscamos el jugador y lo guardamos en un objeto jugador
+				Jugador jugadorActual = null;
+				for (Jugador j : partida.getJugadores()) {
+					if (j.getId() == idJugador)
+						jugadorActual = j;
+				}
+
+				// Si no se ha guardado datos en el objeto jugador es porque no existe
+				if (jugadorActual == null)
+					return "-2";
+
+				// Creamos los valores de la jugada
+				ArrayList<String> listaValores = new ArrayList<>();
+				for (String v : valores.split(",")) {
+					listaValores.add(v);
+				}
+
+				// Creamos la jugada ejecutada por el jugador
+				Jugada jugada = new Jugada(tipo, listaValores, jugadorActual);
+
+				// Habría que validar
+
+				// Seteamos la ultima jugada y el ultimo jugador
+				partida.setUltimaJugada(jugada);
+				partida.setUltimoJugador(jugadorActual);
+
+				// Pasamos al siguiente turno
+				int siguienteTurno = (idJugador % partida.getJugadores().size()) + 1;
+				partida.setIdActual(siguienteTurno);
+
+				return "Jugada ejecutada";
+			}
+		}
+		return "-3"; // No se ha encontrado partifda
+	}
+
+	@GetMapping("/mentiroso/{idPartida}/{idJugador}")
+	public String mentiroso(@PathVariable int idPartida, @PathVariable int idJugador) {
+		// Primero hay que buscar la partida
+		Partida partida = null;
+		for (Partida p : juego.getListaPartida()) {
+			if (p.getId() == idPartida) {
+				partida = p;
+			}
+		}
+		// Si no se sobreescribe el obejto creado es porque no existe
+		if (partida == null)
+			return "-3";
+
+		// Comprobamos el turno
+		if (partida.getIdActual() != idJugador)
+			return "-1";
+
+		// Verificamos si ha habido última jugada
+		Jugada ultimaJugada = partida.getUltimaJugada();
+		if (ultimaJugada == null)
+			return "-2";
+
+		// Comprobamos si mentía
+		Jugador jugadorAcusado = ultimaJugada.getJugador();
+		boolean mentira = comprobarMentira(ultimaJugada, jugadorAcusado);
+
+		if (mentira) {
+			partida.getJugadores().remove(jugadorAcusado);
+		} else {
+			// Crear metodo para eliminar al jugador que ha acusado falsamente (eliminar por
+			// ID)
+		}
+
+		// Comprobamos ganador
+		if (partida.getJugadores().size() == 1)
+			return "El jugador:" + partida.getJugadores().get(0).getNombre() + " ha GANADO";
+
+		// pasamos a una nueva ronda
+		partida.setRondas(partida.getRondas() + 1);
+		// Reiniciamos la ultima jugada
+		partida.setUltimaJugada(null);
+
+		if (mentira) {
+			return "El jugador anterior MENTÍA";
+		} else {
+			return "El jugador anterior decía la VERDAD";
+		}
+	}
+
+	// Método para saber si el jugador miente o no
+	public boolean comprobarMentira(Jugada jugada, Jugador jugador) {
+		// Meter un if que verifique si el jugador miente
+		return false; // Esto en caso de que el jugador decía la verdad
 	}
 
 	// MÉTODOS NO MAPPEADOS
