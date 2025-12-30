@@ -87,7 +87,20 @@ public class MentirosoServidorApplication {
 			if (partida.getId() == idPartida) {
 				if (id == partida.getIdActual()) {
 					int numJugadores = partida.getJugadores().size();
-					mensaje = "0:" + numJugadores + "," + partida.getRondas();
+					// Hay que pasar la jugada del jugador anterior
+					String jugadorAnterior = " ";
+					String tipoJugada = " ";
+					String valoresJugada = " ";
+					// Si no hay jugador anterior, se pasa en blanco
+					if(partida.getUltimoJugador() != null) {
+						jugadorAnterior = partida.getUltimoJugador().getNombre();
+						tipoJugada = partida.getUltimaJugada().getTipoJugada();
+						valoresJugada = "";
+						for (String jugada : partida.getUltimaJugada().getValoresJugada()) {
+							valoresJugada += jugada + " ";
+						}
+					}
+					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada + "," + valoresJugada;
 				} else {
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
