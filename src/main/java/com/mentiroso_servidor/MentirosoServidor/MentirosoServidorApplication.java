@@ -57,10 +57,11 @@ public class MentirosoServidorApplication {
 					mensaje = "-1";
 				else if (partida.getRondas() > 1)
 					return "-2"; // Devolvemos el valor a la función para que no siga buscando más
-				else if (partida.getJugadores().size() == 5)
+				else if (partida.getJugadores().size() == 10)
 					return "-3";
 				else {
-					Jugador jugador = new Jugador(nombre, partida.numJugadores() + 1);
+					int idJugador = partida.numJugadores() + 1;
+					Jugador jugador = new Jugador(nombre, idJugador);
 					repartirCartas(partida, jugador);
 					partida.addJugador(jugador);
 					String cartasJugador = String.join(",", jugador.getMano());
@@ -71,9 +72,8 @@ public class MentirosoServidorApplication {
 						else
 							jugadores += partida.getJugadores().get(i).getNombre() + ",";
 					}
-					System.out.println(juego.toString()); // PRUEBA
-															// --------------------------------------------------------------
-					return jugadores + cartasJugador; // Devolvemos el valor a la función para que no siga buscando más
+					System.out.println(juego.toString()); // PRUEBA ------------------------------------------------
+					return jugadores + cartasJugador + ":" + idJugador; // Devolvemos el valor a la función para que no siga buscando más
 				}
 			}
 		}
@@ -87,7 +87,20 @@ public class MentirosoServidorApplication {
 			if (partida.getId() == idPartida) {
 				if (id == partida.getIdActual()) {
 					int numJugadores = partida.getJugadores().size();
-					mensaje = "0:" + numJugadores + "," + partida.getRondas();
+					// Hay que pasar la jugada del jugador anterior
+					String jugadorAnterior = " ";
+					String tipoJugada = " ";
+					String valoresJugada = " ";
+					// Si no hay jugador anterior, se pasa en blanco
+					if(partida.getUltimoJugador() != null) {
+						jugadorAnterior = partida.getUltimoJugador().getNombre();
+						tipoJugada = partida.getUltimaJugada().getTipoJugada();
+						valoresJugada = "";
+						for (String jugada : partida.getUltimaJugada().getValoresJugada()) {
+							valoresJugada += jugada + " ";
+						}
+					}
+					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada + "," + valoresJugada;
 				} else {
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
@@ -144,7 +157,9 @@ public class MentirosoServidorApplication {
 				// Pasamos al siguiente turno
 				int siguienteTurno = (idJugador % partida.getJugadores().size()) + 1;
 				partida.setIdActual(siguienteTurno);
-
+				// Cambiamos la ronda en caso de ser el último jugador
+				if (idJugador == partida.getJugadores().size())
+					partida.setRondas(partida.getRondas() + 1);
 				return "Jugada ejecutada";
 			}
 		}
