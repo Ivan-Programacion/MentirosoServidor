@@ -73,7 +73,8 @@ public class MentirosoServidorApplication {
 							jugadores += partida.getJugadores().get(i).getNombre() + ",";
 					}
 					System.out.println(juego.toString()); // PRUEBA ------------------------------------------------
-					return jugadores + cartasJugador + ":" + idJugador; // Devolvemos el valor a la función para que no siga buscando más
+					return jugadores + cartasJugador + ":" + idJugador; // Devolvemos el valor a la función para que no
+																		// siga buscando más
 				}
 			}
 		}
@@ -92,15 +93,16 @@ public class MentirosoServidorApplication {
 					String tipoJugada = " ";
 					String valoresJugada = " ";
 					// Si no hay jugador anterior, se pasa en blanco
-					if(partida.getUltimoJugador() != null) {
-						jugadorAnterior = partida.getUltimoJugador().getNombre();
+					if (partida.getUltimaJugada() != null) {
+						jugadorAnterior = partida.getUltimaJugada().getJugador().getNombre();
 						tipoJugada = partida.getUltimaJugada().getTipoJugada();
 						valoresJugada = "";
 						for (String jugada : partida.getUltimaJugada().getValoresJugada()) {
 							valoresJugada += jugada + " ";
 						}
 					}
-					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada + "," + valoresJugada;
+					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada
+							+ "," + valoresJugada;
 				} else {
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
@@ -150,9 +152,8 @@ public class MentirosoServidorApplication {
 
 				// Habría que validar
 
-				// Seteamos la ultima jugada y el ultimo jugador
+				// Seteamos la ultima jugada
 				partida.setUltimaJugada(jugada);
-				partida.setUltimoJugador(jugadorActual);
 
 				// Pasamos al siguiente turno
 				int siguienteTurno = (idJugador % partida.getJugadores().size()) + 1;
@@ -177,10 +178,6 @@ public class MentirosoServidorApplication {
 		}
 		// Si no se sobreescribe el obejto creado es porque no existe
 		if (partida == null)
-			return "-3";
-
-		// Comprobamos el turno
-		if (partida.getIdActual() != idJugador)
 			return "-1";
 
 		// Verificamos si ha habido última jugada
@@ -190,38 +187,47 @@ public class MentirosoServidorApplication {
 
 		// Comprobamos si mentía
 		Jugador jugadorAcusado = ultimaJugada.getJugador();
-		boolean mentira = comprobarMentira(ultimaJugada, jugadorAcusado);
+		boolean mentira = comprobarMentira(ultimaJugada);
 
 		if (mentira) {
-			partida.getJugadores().remove(jugadorAcusado);
+//			partida.getJugadores().remove(jugadorAcusado);
 		} else {
 			// Crear metodo para eliminar al jugador que ha acusado falsamente (eliminar por
 			// ID)
 		}
-
-		// Comprobamos ganador
-		if (partida.getJugadores().size() == 1)
-			return "El jugador:" + partida.getJugadores().get(0).getNombre() + " ha GANADO";
-
-		// pasamos a una nueva ronda
-		partida.setRondas(partida.getRondas() + 1);
-		// Reiniciamos la ultima jugada
-		partida.setUltimaJugada(null);
-
-		if (mentira) {
-			return "El jugador anterior MENTÍA";
-		} else {
-			return "El jugador anterior decía la VERDAD";
-		}
-	}
-
-	// Método para saber si el jugador miente o no
-	public boolean comprobarMentira(Jugada jugada, Jugador jugador) {
-		// Meter un if que verifique si el jugador miente
-		return false; // Esto en caso de que el jugador decía la verdad
+		return "";
 	}
 
 	// MÉTODOS NO MAPPEADOS
+
+	// Método para saber si el jugador miente o no
+	public boolean comprobarMentira(Jugada jugada) {
+		// jugada.valoresJugada --> ArrayList de la jugada
+		// jugada.jugador.mano --> ArrayList de la mano
+
+		// Se crean nuevas instancias con los las listas de los valores de la jugada y
+		// de la mano del jugador
+		ArrayList<String> valoresJugada = new ArrayList<String>(jugada.getValoresJugada());
+		ArrayList<String> manoJugador = new ArrayList<String>(jugada.getJugador().getMano());
+		// Cogemos el size de los valores de la jugada
+		int cartasJugada = valoresJugada.size();
+		// Añadimos un contador para comparar después
+		int contadorCoincidencia = 0;
+		// Comprobamos, 1 a 1, si contiene los valores de la jugada en la mano del
+		// jugador
+		for (String cartaJugada : valoresJugada) {
+			for (String cartaMano : manoJugador) {
+				if (cartaJugada.equals(cartaMano)) {
+					cartaMano = "0";
+					contadorCoincidencia++;
+					break; // Se hace break para que no siga buscando
+				}
+			}
+		}
+		// Comparamos contador de coincidencias con el número de cartas que ha jugado
+		// (valores jugada)
+		return contadorCoincidencia == cartasJugada ? true : false;
+	}
 
 	public void repartirCartas(Partida partida, Jugador jugador) {
 		Random random = new Random();

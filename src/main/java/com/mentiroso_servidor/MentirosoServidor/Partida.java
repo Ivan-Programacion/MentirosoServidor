@@ -11,7 +11,6 @@ public class Partida {
 	private ArrayList<Jugador> jugadores;
 	private int idActual;
 	private Jugada ultimaJugada;
-	private Jugador ultimoJugador;
 
 	public Partida(int id) {
 		this.id = id;
@@ -87,14 +86,6 @@ public class Partida {
 
 	public void setUltimaJugada(Jugada ultimaJugada) {
 		this.ultimaJugada = ultimaJugada;
-	}
-
-	public Jugador getUltimoJugador() {
-		return ultimoJugador;
-	}
-
-	public void setUltimoJugador(Jugador ultimoJugador) {
-		this.ultimoJugador = ultimoJugador;
 	}
 
 	@Override
