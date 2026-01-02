@@ -147,6 +147,18 @@ public class MentirosoServidorApplication {
 					listaValores.add(v);
 				}
 
+				/*
+				 * Antes de meter el tipo y los valores tiene que comprobar una cosa, los
+				 * valores que te pasa el usuario son diferentes ahora, ahora si el usuario dice
+				 * pareja, solo te manda un numero del cual se supone que es la pareja. Por lo
+				 * cual el servidor en la lista valores, en vez de tener dos ("6", "6") ahora
+				 * tiene uno ("6"), entonce stiene que cambiar que en vez de verificar dos
+				 * numeros en los valores, verifciar el mismo pero duplicado. mas de lo mismo
+				 * con el trio, solo se manda un numero, en vez de mandarte "6", "6", "6", se te
+				 * manda solo un numero ("6"), y ya con ese numero triplicado tendras que comprobar si
+				 * el usuario lo tiene en sus "cartasMano" o no.
+				 */
+
 				// Creamos la jugada ejecutada por el jugador
 				Jugada jugada = new Jugada(tipo, listaValores, jugadorActual);
 
@@ -162,7 +174,6 @@ public class MentirosoServidorApplication {
 		}
 		return "-3"; // No se ha encontrado partifda
 	}
-
 
 	@GetMapping("/mentiroso/{idPartida}/{idJugador}")
 	public String mentiroso(@PathVariable int idPartida, @PathVariable int idJugador) {
@@ -202,7 +213,7 @@ public class MentirosoServidorApplication {
 	}
 
 	// MÉTODOS NO MAPPEADOS
-	
+
 	private void cambioTurno(int idJugador, Partida partida) {
 		int contadorTurno = 1;
 		boolean jugadorEncontrado = false;
