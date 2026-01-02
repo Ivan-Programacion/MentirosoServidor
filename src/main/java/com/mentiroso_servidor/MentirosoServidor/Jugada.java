@@ -1,14 +1,14 @@
 package com.mentiroso_servidor.MentirosoServidor;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Jugada {
-	
+
 	private String tipoJugada;
-	private List<String> valoresJugada;
+	private ArrayList<String> valoresJugada;
 	private Jugador jugador;
-	
-	public Jugada(String tipoJugada, List<String> valoresJugada, Jugador jugador) {
+
+	public Jugada(String tipoJugada, ArrayList<String> valoresJugada, Jugador jugador) {
 		this.tipoJugada = tipoJugada;
 		this.valoresJugada = valoresJugada;
 		this.jugador = jugador;
@@ -22,11 +22,11 @@ public class Jugada {
 		this.tipoJugada = tipoJugada;
 	}
 
-	public List<String> getValoresJugada() {
+	public ArrayList<String> getValoresJugada() {
 		return valoresJugada;
 	}
 
-	public void setValoresJugada(List<String> valoresJugada) {
+	public void setValoresJugada(ArrayList<String> valoresJugada) {
 		this.valoresJugada = valoresJugada;
 	}
 
@@ -37,10 +37,5 @@ public class Jugada {
 	public void setJugador(Jugador jugador) {
 		this.jugador = jugador;
 	}
-	
-	
-	
-	
-	
 
 }
