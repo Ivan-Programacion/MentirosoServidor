@@ -6,13 +6,11 @@ public class Jugador {
 	private int id;
 	private String nombre;
 	private ArrayList<String> mano;
-	private boolean mentiroso;
 
 	public Jugador(String nombre, int id) {
 		this.nombre = nombre;
 		this.id = id;
 		this.mano = new ArrayList<>();
-		mentiroso = false;
 	}
 
 	public int getId() {
@@ -37,14 +35,6 @@ public class Jugador {
 
 	public void setMano(ArrayList<String> mano) {
 		this.mano = mano;
-	}
-
-	public boolean isMentiroso() {
-		return mentiroso;
-	}
-
-	public void setMentiroso(boolean mentiroso) {
-		this.mentiroso = mentiroso;
 	}
 
 	@Override

@@ -155,17 +155,14 @@ public class MentirosoServidorApplication {
 				// Seteamos la ultima jugada
 				partida.setUltimaJugada(jugada);
 
-				// Pasamos al siguiente turno
-				int siguienteTurno = (idJugador % partida.getJugadores().size()) + 1;
-				partida.setIdActual(siguienteTurno);
-				// Cambiamos la ronda en caso de ser el último jugador
-				if (idJugador == partida.getJugadores().size())
-					partida.setRondas(partida.getRondas() + 1);
+				// Pasamos al siguiente turno y comprobamos si el jugador existe o no
+				cambioTurno(idJugador, partida);
 				return "Jugada ejecutada";
 			}
 		}
 		return "-3"; // No se ha encontrado partifda
 	}
+
 
 	@GetMapping("/mentiroso/{idPartida}/{idJugador}")
 	public String mentiroso(@PathVariable int idPartida, @PathVariable int idJugador) {
@@ -188,17 +185,43 @@ public class MentirosoServidorApplication {
 		// Comprobamos si mentía
 		Jugador jugadorAcusado = ultimaJugada.getJugador();
 		boolean mentira = comprobarMentira(ultimaJugada);
-
+		// Si es verdad, eliminamos al jugador actual y devolvemos t (de true)
+		// Si es mentira, eliminamos al jugador acusado y devolvemos f (de false)
 		if (mentira) {
-//			partida.getJugadores().remove(jugadorAcusado);
-		} else {
-			// Crear metodo para eliminar al jugador que ha acusado falsamente (eliminar por
-			// ID)
+			for (Jugador jugador : partida.getJugadores()) {
+				if (idJugador == jugador.getId()) {
+					partida.getJugadores().remove(jugador);
+					cambioTurno(idJugador, partida);
+					return "t";
+				}
+			}
 		}
-		return "";
+		partida.getJugadores().remove(jugadorAcusado);
+		cambioTurno(idJugador, partida);
+		return "f";
 	}
 
 	// MÉTODOS NO MAPPEADOS
+	
+	private void cambioTurno(int idJugador, Partida partida) {
+		int contadorTurno = 1;
+		boolean jugadorEncontrado = false;
+		while (!jugadorEncontrado) {
+			int siguienteTurno = (idJugador % partida.getJugadores().size()) + contadorTurno;
+			for (Jugador jugador : partida.getJugadores()) {
+				if (jugador.getId() == siguienteTurno) {
+					jugadorEncontrado = true;
+					partida.setIdActual(siguienteTurno);
+				}
+			}
+			if (!jugadorEncontrado)
+				contadorTurno++;
+		}
+		System.err.println("ID ACTUAL: " + partida.getIdActual()); // PRUEBA --------------------------
+		// Cambiamos la ronda en caso de ser el último jugador
+		if (idJugador == partida.getJugadores().size())
+			partida.setRondas(partida.getRondas() + 1);
+	}
 
 	// Método para saber si el jugador miente o no
 	public boolean comprobarMentira(Jugada jugada) {
