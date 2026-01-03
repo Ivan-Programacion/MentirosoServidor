@@ -104,6 +104,15 @@ public class MentirosoServidorApplication {
 					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada
 							+ "," + valoresJugada;
 				} else {
+					/*
+					 * Os dejo esto para que lo continuéis. Hay que comprobar si el jugador con el
+					 * id pasado por parametro existe. Si no existe, habrá que enviar al usuario un
+					 * -2 (dentro de mensaje) Si existe, se deja el bucle for que está puesto justo
+					 * abajo (es el que indica al usuario que todavía no es su turno) Todo esto, al
+					 * pasar al cliente, habrá que hacer un nuevo else if donde se indique que, en
+					 * caso de haber recibido un -2 quiere decir que has sido eliminado de la
+					 * partida, y por lo tanto se le saca al menú inicial.
+					 */
 					for (Jugador jugador : partida.getJugadores()) {
 						if (partida.getIdActual() == jugador.getId()) {
 							mensaje = "-1:" + jugador.getNombre();
@@ -140,29 +149,17 @@ public class MentirosoServidorApplication {
 				// Si no se ha guardado datos en el objeto jugador es porque no existe
 				if (jugadorActual == null)
 					return "-2";
-
+				// Si el jugador se ha guardado correctamente, sumamos en 1 los turnos jugados
+				// por el jugador
+				jugadorActual.setTurnosJugados(jugadorActual.getTurnosJugados() + 1);
 				// Creamos los valores de la jugada
 				ArrayList<String> listaValores = new ArrayList<>();
 				for (String v : valores.split(",")) {
 					listaValores.add(v);
 				}
 
-				/*
-				 * Antes de meter el tipo y los valores tiene que comprobar una cosa, los
-				 * valores que te pasa el usuario son diferentes ahora, ahora si el usuario dice
-				 * pareja, solo te manda un numero del cual se supone que es la pareja. Por lo
-				 * cual el servidor en la lista valores, en vez de tener dos ("6", "6") ahora
-				 * tiene uno ("6"), entonce stiene que cambiar que en vez de verificar dos
-				 * numeros en los valores, verifciar el mismo pero duplicado. mas de lo mismo
-				 * con el trio, solo se manda un numero, en vez de mandarte "6", "6", "6", se te
-				 * manda solo un numero ("6"), y ya con ese numero triplicado tendras que comprobar si
-				 * el usuario lo tiene en sus "cartasMano" o no.
-				 */
-
 				// Creamos la jugada ejecutada por el jugador
 				Jugada jugada = new Jugada(tipo, listaValores, jugadorActual);
-
-				// Habría que validar
 
 				// Seteamos la ultima jugada
 				partida.setUltimaJugada(jugada);
@@ -203,12 +200,14 @@ public class MentirosoServidorApplication {
 				if (idJugador == jugador.getId()) {
 					partida.getJugadores().remove(jugador);
 					cambioTurno(idJugador, partida);
+					System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
 					return "t";
 				}
 			}
 		}
 		partida.getJugadores().remove(jugadorAcusado);
 		cambioTurno(idJugador, partida);
+		System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
 		return "f";
 	}
 
@@ -217,6 +216,8 @@ public class MentirosoServidorApplication {
 	private void cambioTurno(int idJugador, Partida partida) {
 		int contadorTurno = 1;
 		boolean jugadorEncontrado = false;
+		// Si encuentra al jugador, lo señala como idActual (jugador actual)
+		// Si no lo encuentra, pasa al siguiente jugador
 		while (!jugadorEncontrado) {
 			int siguienteTurno = (idJugador % partida.getJugadores().size()) + contadorTurno;
 			for (Jugador jugador : partida.getJugadores()) {
@@ -230,8 +231,11 @@ public class MentirosoServidorApplication {
 		}
 		System.err.println("ID ACTUAL: " + partida.getIdActual()); // PRUEBA --------------------------
 		// Cambiamos la ronda en caso de ser el último jugador
-		if (idJugador == partida.getJugadores().size())
-			partida.setRondas(partida.getRondas() + 1);
+		for (Jugador jugador : partida.getJugadores()) {
+			if (jugador.getId() == partida.getIdActual())
+				if (jugador.getTurnosJugados() == partida.getRondas())
+					partida.setRondas(partida.getRondas() + 1);
+		}
 	}
 
 	// Método para saber si el jugador miente o no
