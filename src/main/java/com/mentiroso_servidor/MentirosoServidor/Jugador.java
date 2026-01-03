@@ -6,11 +6,13 @@ public class Jugador {
 	private int id;
 	private String nombre;
 	private ArrayList<String> mano;
+	private int turnosJugados;
 
 	public Jugador(String nombre, int id) {
 		this.nombre = nombre;
 		this.id = id;
-		this.mano = new ArrayList<>();
+		mano = new ArrayList<>();
+		turnosJugados = 0;
 	}
 
 	public int getId() {
@@ -35,6 +37,14 @@ public class Jugador {
 
 	public void setMano(ArrayList<String> mano) {
 		this.mano = mano;
+	}
+
+	public int getTurnosJugados() {
+		return turnosJugados;
+	}
+
+	public void setTurnosJugados(int turnosJugados) {
+		this.turnosJugados = turnosJugados;
 	}
 
 	@Override
