@@ -111,8 +111,8 @@ public class MentirosoServidorApplication {
 							existeJugador = true;
 						}
 					}
-					
-					// Si no obtenemos resultado significa que se ha eliminado 
+
+					// Si no obtenemos resultado significa que se ha eliminado
 					if (!existeJugador) {
 						mensaje = "-2";
 					} else {
@@ -186,33 +186,46 @@ public class MentirosoServidorApplication {
 			}
 		}
 		// Si no se sobreescribe el obejto creado es porque no existe
-		if (partida == null)
+		if (partida == null) {
 			return "-1";
+		}
 
 		// Verificamos si ha habido última jugada
 		Jugada ultimaJugada = partida.getUltimaJugada();
-		if (ultimaJugada == null)
+		if (ultimaJugada == null) {
 			return "-2";
+		}
 
 		// Comprobamos si mentía
 		Jugador jugadorAcusado = ultimaJugada.getJugador();
-		boolean mentira = comprobarMentira(ultimaJugada);
+		boolean mentiraCartas = comprobarMentira(ultimaJugada);
+		boolean mentiraTipo = comprobarTipoJugada(ultimaJugada);
+		// Si alguna de las comprobaciones es false lo trasladamos a mentira
+		boolean mentira = mentiraCartas || mentiraTipo;
+
 		// Si es verdad, eliminamos al jugador actual y devolvemos t (de true)
 		// Si es mentira, eliminamos al jugador acusado y devolvemos f (de false)
 		if (mentira) {
-			for (Jugador jugador : partida.getJugadores()) {
-				if (idJugador == jugador.getId()) {
-					partida.getJugadores().remove(jugador);
-					cambioTurno(idJugador, partida);
-					System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
-					return "t";
+			// El acusado mentía → se elimina el acusado
+			partida.getJugadores().remove(jugadorAcusado);
+			partida.setUltimaJugada(null); // Evitar que la jugada eliminada se siga mostrando
+			cambioTurno(jugadorAcusado.getId(), partida);
+			return "f"; // el cliente interpreta: “era mentira”
+		} else {
+			// El acusado decía la verdad → se elimina el acusador
+			Jugador acusador = null;
+			for (Jugador j : partida.getJugadores()) {
+				if (j.getId() == idJugador) {
+					acusador = j;
 				}
 			}
+			if (acusador != null) {
+				partida.getJugadores().remove(acusador);
+				cambioTurno(idJugador, partida);
+			}
+			System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
+			return "t"; // el cliente interpreta: “era verdad”
 		}
-		partida.getJugadores().remove(jugadorAcusado);
-		cambioTurno(idJugador, partida);
-		System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
-		return "f";
 	}
 
 	// MÉTODOS NO MAPPEADOS
@@ -242,6 +255,65 @@ public class MentirosoServidorApplication {
 		}
 	}
 
+	// Devuelve true en el caso de que el tipo de jugada no coincida con los valores
+	// (miente) y devuelve false en caso de que el tipo de jugada sea correcto
+	public boolean comprobarTipoJugada(Jugada jugada) {
+		String tipo = jugada.getTipoJugada();
+		ArrayList<String> valores = jugada.getValoresJugada();
+		// caso CARTA ALTA
+		if (tipo.equals("Carta_alta")) {
+			return valores.size() != 1;
+		}
+		// caso PAREJA
+		if (tipo.equals("Pareja")) {
+			return valores.size() != 2 || !valores.get(0).equals(valores.get(1));
+		}
+		// caso TRÍO
+		if (tipo.equals("Trío")) {
+			if (valores.size() != 3)
+				return true;
+			return !(valores.get(0).equals(valores.get(1)) && valores.get(1).equals(valores.get(2)));
+		}
+		// caso DOBLE PAREJA
+		if (tipo.equals("Doble_pareja")) {
+			if (valores.size() != 4)
+				return true;
+			String a = valores.get(0);
+			String b = valores.get(1);
+			String c = valores.get(2);
+			String d = valores.get(3);
+			return !(a.equals(b) && c.equals(d) && !a.equals(c));
+		}
+		// caso FULL HOUSE
+		if (tipo.equals("Full_House")) {
+			if (valores.size() != 5)
+				return true;
+
+			boolean caso1 = valores.get(0).equals(valores.get(1)) && valores.get(1).equals(valores.get(2))
+					&& valores.get(3).equals(valores.get(4)) && !valores.get(0).equals(valores.get(3));
+
+			boolean caso2 = valores.get(0).equals(valores.get(1)) && valores.get(2).equals(valores.get(3))
+					&& valores.get(3).equals(valores.get(4)) && !valores.get(0).equals(valores.get(2));
+
+			return !(caso1 || caso2);
+		}
+		// caso PÓKER
+		if (tipo.equals("Póker")) {
+			if (valores.size() != 4)
+				return true;
+
+			String primera = valores.get(0);
+			for (String v : valores) {
+				if (!v.equals(primera))
+					return true;
+			}
+			return false;
+		}
+
+		// No se reconoce = mentiras
+		return true;
+	}
+
 	// Método para saber si el jugador miente o no
 	public boolean comprobarMentira(Jugada jugada) {
 		// jugada.valoresJugada --> ArrayList de la jugada
@@ -257,18 +329,19 @@ public class MentirosoServidorApplication {
 		int contadorCoincidencia = 0;
 		// Comprobamos, 1 a 1, si contiene los valores de la jugada en la mano del
 		// jugador
+
 		for (String cartaJugada : valoresJugada) {
-			for (String cartaMano : manoJugador) {
-				if (cartaJugada.equals(cartaMano)) {
-					cartaMano = "0";
+			for (int i = 0; i < manoJugador.size(); i++) {
+				if (cartaJugada.equals(manoJugador.get(i))) {
+					manoJugador.set(i, "0"); // anulamos carta
 					contadorCoincidencia++;
-					break; // Se hace break para que no siga buscando
+					break;
 				}
 			}
 		}
 		// Comparamos contador de coincidencias con el número de cartas que ha jugado
 		// (valores jugada)
-		return contadorCoincidencia == cartasJugada ? true : false;
+		return contadorCoincidencia != cartasJugada;
 	}
 
 	public void repartirCartas(Partida partida, Jugador jugador) {
