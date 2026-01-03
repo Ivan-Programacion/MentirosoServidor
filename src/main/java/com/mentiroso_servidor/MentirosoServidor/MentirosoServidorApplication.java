@@ -104,19 +104,23 @@ public class MentirosoServidorApplication {
 					mensaje = "0:" + numJugadores + "," + partida.getRondas() + ":" + jugadorAnterior + "," + tipoJugada
 							+ "," + valoresJugada;
 				} else {
-					/*
-					 * Os dejo esto para que lo continuéis. Hay que comprobar si el jugador con el
-					 * id pasado por parametro existe. Si no existe, habrá que enviar al usuario un
-					 * -2 (dentro de mensaje) Si existe, se deja el bucle for que está puesto justo
-					 * abajo (es el que indica al usuario que todavía no es su turno) Todo esto, al
-					 * pasar al cliente, habrá que hacer un nuevo else if donde se indique que, en
-					 * caso de haber recibido un -2 quiere decir que has sido eliminado de la
-					 * partida, y por lo tanto se le saca al menú inicial.
-					 */
-					for (Jugador jugador : partida.getJugadores()) {
-						if (partida.getIdActual() == jugador.getId()) {
-							mensaje = "-1:" + jugador.getNombre();
-
+					// Comprobamos si el jugador existe en la partida
+					boolean existeJugador = false;
+					for (Jugador j : partida.getJugadores()) {
+						if (j.getId() == id) {
+							existeJugador = true;
+						}
+					}
+					
+					// Si no obtenemos resultado significa que se ha eliminado 
+					if (!existeJugador) {
+						mensaje = "-2";
+					} else {
+						// En caso de que exista indicamos a quién le toca
+						for (Jugador jugador : partida.getJugadores()) {
+							if (partida.getIdActual() == jugador.getId()) {
+								mensaje = "-1:" + jugador.getNombre();
+							}
 						}
 					}
 				}
