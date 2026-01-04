@@ -111,8 +111,8 @@ public class MentirosoServidorApplication {
 							existeJugador = true;
 						}
 					}
-					
-					// Si no obtenemos resultado significa que se ha eliminado 
+
+					// Si no obtenemos resultado significa que se ha eliminado
 					if (!existeJugador) {
 						mensaje = "-2";
 					} else {
@@ -200,19 +200,24 @@ public class MentirosoServidorApplication {
 		// Si es verdad, eliminamos al jugador actual y devolvemos t (de true)
 		// Si es mentira, eliminamos al jugador acusado y devolvemos f (de false)
 		if (mentira) {
-			for (Jugador jugador : partida.getJugadores()) {
-				if (idJugador == jugador.getId()) {
-					partida.getJugadores().remove(jugador);
-					cambioTurno(idJugador, partida);
-					System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
-					return "t";
+			partida.getJugadores().remove(jugadorAcusado);
+			cambioTurno(jugadorAcusado.getId(), partida);
+			return "t";
+		} else {
+			Jugador acusador = null;
+			for (Jugador j : partida.getJugadores()) {
+				if (j.getId() == idJugador) {
+					acusador = j;
+					break;
 				}
 			}
+			if (acusador != null) {
+				partida.getJugadores().remove(acusador);
+				cambioTurno(acusador.getId(), partida);
+			}
+			return "f";
 		}
-		partida.getJugadores().remove(jugadorAcusado);
-		cambioTurno(idJugador, partida);
-		System.err.println("Rondas: " + partida.getRondas()); // PRUEBA -----------
-		return "f";
+
 	}
 
 	// MÉTODOS NO MAPPEADOS
@@ -268,7 +273,7 @@ public class MentirosoServidorApplication {
 		}
 		// Comparamos contador de coincidencias con el número de cartas que ha jugado
 		// (valores jugada)
-		return contadorCoincidencia == cartasJugada ? true : false;
+		return contadorCoincidencia == cartasJugada ? false : true;
 	}
 
 	public void repartirCartas(Partida partida, Jugador jugador) {
