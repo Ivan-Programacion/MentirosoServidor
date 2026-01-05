@@ -197,10 +197,11 @@ public class MentirosoServidorApplication {
 		// Comprobamos si mentía
 		Jugador jugadorAcusado = ultimaJugada.getJugador();
 		boolean mentira = comprobarMentira(ultimaJugada);
-		// Si es verdad, eliminamos al jugador actual y devolvemos t (de true)
-		// Si es mentira, eliminamos al jugador acusado y devolvemos f (de false)
+		// Si es mentira, eliminamos al jugador acusado y devolvemos t (de true)
+		// Si es verdad, eliminamos al jugador actual y devolvemos f (de false)
 		if (mentira) {
 			partida.getJugadores().remove(jugadorAcusado);
+//			System.err.println("LISTA JUGADORES TRAS ELIMINAR: " + partida.getJugadores().toString()); // PRUEBA -------
 			cambioTurno(jugadorAcusado.getId(), partida);
 			return "t";
 		} else {
@@ -243,8 +244,10 @@ public class MentirosoServidorApplication {
 		for (Jugador jugador : partida.getJugadores()) {
 			if (jugador.getId() == partida.getIdActual())
 				if (jugador.getTurnosJugados() == partida.getRondas())
+					System.err.println("TURNOS JUGADOS JUGADOR -> " + jugador.getTurnosJugados()); //
 					partida.setRondas(partida.getRondas() + 1);
 		}
+		System.err.println("RONDA ACTUAL -> " + partida.getRondas()); // PRUEBA ----------------------
 	}
 
 	// Método para saber si el jugador miente o no
@@ -263,9 +266,9 @@ public class MentirosoServidorApplication {
 		// Comprobamos, 1 a 1, si contiene los valores de la jugada en la mano del
 		// jugador
 		for (String cartaJugada : valoresJugada) {
-			for (String cartaMano : manoJugador) {
-				if (cartaJugada.equals(cartaMano)) {
-					cartaMano = "0";
+			for (int i = 0; i < manoJugador.size(); i++) {
+				if (cartaJugada.equals(manoJugador.get(i))) {
+					manoJugador.set(i, "0");
 					contadorCoincidencia++;
 					break; // Se hace break para que no siga buscando
 				}
