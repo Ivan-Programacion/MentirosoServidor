@@ -45,7 +45,7 @@ public class MentirosoServidorApplication {
 		juego.addPartida(partida);
 		String cartasJugador = String.join(",", jugador.getMano());
 		String respuestaServidor = numeroJugador + ":" + cartasJugador + "," + numeroPartida;
-		System.out.println(juego.toString()); // PRUEBA --------------------------------------------------------------
+		System.out.println(juego.toString());
 		return respuestaServidor;
 
 	}
@@ -74,7 +74,7 @@ public class MentirosoServidorApplication {
 						else
 							jugadores += partida.getJugadores().get(i).getNombre() + ",";
 					}
-					System.out.println(juego.toString()); // PRUEBA ------------------------------------------------
+					System.out.println(juego.toString());
 					return jugadores + cartasJugador + ":" + idJugador; // Devolvemos el valor a la función para que no
 																		// siga buscando más
 				}
@@ -200,6 +200,15 @@ public class MentirosoServidorApplication {
 		if (ultimaJugada == null)
 			return "-2";
 
+		Jugador acusador = null;
+		for (Jugador j : partida.getJugadores()) {
+			if (j.getId() == idJugador) {
+				acusador = j;
+				break;
+			}
+		}
+		acusador.setTurnosJugados(acusador.getTurnosJugados() + 1);
+
 		// Comprobamos si mentía
 		Jugador jugadorAcusado = ultimaJugada.getJugador();
 		boolean mentira = comprobarMentira(ultimaJugada);
@@ -207,24 +216,17 @@ public class MentirosoServidorApplication {
 		// Si es verdad, eliminamos al jugador actual y devolvemos f (de false)
 		if (mentira) {
 			partida.getJugadores().remove(jugadorAcusado);
-//			System.err.println("LISTA JUGADORES TRAS ELIMINAR: " + partida.getJugadores().toString()); // PRUEBA -------
 			// Reseteamos la jugada anterior
 			partida.setUltimaJugada(null);
 			cambioTurno(partida);
 			return "t";
 		} else {
-			Jugador acusador = null;
-			for (Jugador j : partida.getJugadores()) {
-				if (j.getId() == idJugador) {
-					acusador = j;
-					break;
-				}
-			}
 			if (acusador != null) {
 				partida.getJugadores().remove(acusador);
 				// Reseteamos la jugada anterior
 				partida.setUltimaJugada(null);
 				cambioTurno(partida);
+
 			}
 			return "f";
 		}
@@ -260,13 +262,13 @@ public class MentirosoServidorApplication {
 			valor++;
 		}
 		boolean respuesta = true;
-		System.err.println("JUGADA -> " + jugada.getValoresJugada().toString()); // PRUEBA -----------------------
+		System.err.println("JUGADA -> " + jugada.getValoresJugada().toString());
 		if (jugadaAnterior == null) {
-			System.err.println("JUGADA ANTERIOR NULA"); // PRUEBA -----------------------------------------------------
+			System.err.println("JUGADA ANTERIOR NULA");
 			respuesta = true;
 		} else {
-			System.err.println("JUGADA ANTERIOR -> " + jugadaAnterior.getValoresJugada().toString()); // PRUEBA
-																										// ---------------
+			System.err.println("JUGADA ANTERIOR -> " + jugadaAnterior.getValoresJugada().toString());
+
 			int valorJugadaAnterior = 0;
 			int valorJugada = 0;
 			for (Map.Entry<String, Integer> entry : comprobarJugada.entrySet()) {
@@ -275,8 +277,8 @@ public class MentirosoServidorApplication {
 				if (jugadaAnterior.getTipoJugada().equals(entry.getKey()))
 					valorJugadaAnterior = entry.getValue();
 			}
-			System.err.println("valorJugada = " + valorJugada); // PRUEBA ---------------------------------------------
-			System.err.println("valorJugadaAnterior = " + valorJugadaAnterior); // PRUEBA -----------
+			System.err.println("valorJugada = " + valorJugada);
+			System.err.println("valorJugadaAnterior = " + valorJugadaAnterior);
 			if (valorJugada > valorJugadaAnterior)
 				respuesta = true;
 			else if (valorJugada < valorJugadaAnterior)
@@ -345,8 +347,8 @@ public class MentirosoServidorApplication {
 						}
 					}
 				}
-				System.err.println("valorJugada = " + valorJugada); // PRUEBA-----------
-				System.err.println("valorJugadaAnterior = " + valorJugadaAnterior); // PRUEBA-----------
+				System.err.println("valorJugada = " + valorJugada);
+				System.err.println("valorJugadaAnterior = " + valorJugadaAnterior);
 				if (valorJugada < valorJugadaAnterior)
 					respuesta = false;
 			}
@@ -355,8 +357,6 @@ public class MentirosoServidorApplication {
 	}
 
 	private void cambioTurno(Partida partida) {
-//		System.err.println("ID ACTUAL ANTES: " + partida.getIdActual()); // PRUEBA --------------------------
-//		System.err.println("RONDA ACTUAL ANTES -> " + partida.getRondas()); // PRUEBA ----------------------
 		boolean rondaTerminada = true;
 		// Mientras la ronda siga activa, va a buscar jugadores que NO hayan jugado
 		// todavía dicha ronda
@@ -377,8 +377,6 @@ public class MentirosoServidorApplication {
 				partida.setRondas(partida.getRondas() + 1);
 			}
 		}
-//		System.err.println("ID ACTUAL DESPUÉS: " + partida.getIdActual()); // PRUEBA --------------------------
-//		System.err.println("RONDA ACTUAL DESPUÉS -> " + partida.getRondas()); // PRUEBA ----------------------
 	}
 
 	// Método para saber si el jugador miente o no
