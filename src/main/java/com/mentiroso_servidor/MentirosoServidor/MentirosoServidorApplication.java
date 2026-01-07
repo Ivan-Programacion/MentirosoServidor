@@ -1,8 +1,10 @@
 package com.mentiroso_servidor.MentirosoServidor;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -153,18 +155,22 @@ public class MentirosoServidorApplication {
 				// Si no se ha guardado datos en el objeto jugador es porque no existe
 				if (jugadorActual == null)
 					return "-2";
-				// Si el jugador se ha guardado correctamente, sumamos en 1 los turnos jugados
-				// por el jugador
-				jugadorActual.setTurnosJugados(jugadorActual.getTurnosJugados() + 1);
 				// Creamos los valores de la jugada
 				ArrayList<String> listaValores = new ArrayList<>();
 				for (String v : valores.split(",")) {
 					listaValores.add(v);
 				}
+				// Si el jugador se ha guardado correctamente, sumamos en 1 los turnos jugados
+				// por el jugador
+				jugadorActual.setTurnosJugados(jugadorActual.getTurnosJugados() + 1);
 
-				// Creamos la jugada ejecutada por el jugador
+				// Creamos la jugada ejecutada por el jugador y recuperamos la jugada anterior
 				Jugada jugada = new Jugada(tipo, listaValores, jugadorActual);
-
+				Jugada jugadaAnterior = partida.getUltimaJugada();
+				// Comprobamos la jugada si es válida o no (si es mayor que la que había o no).
+				// Si no es válida, retornamos un mensaje de error
+				if (!jugadaValida(jugada, jugadaAnterior))
+					return "-4";
 				// Seteamos la ultima jugada
 				partida.setUltimaJugada(jugada);
 
@@ -202,6 +208,8 @@ public class MentirosoServidorApplication {
 		if (mentira) {
 			partida.getJugadores().remove(jugadorAcusado);
 //			System.err.println("LISTA JUGADORES TRAS ELIMINAR: " + partida.getJugadores().toString()); // PRUEBA -------
+			// Reseteamos la jugada anterior
+			partida.setUltimaJugada(null);
 			cambioTurno(partida);
 			return "t";
 		} else {
@@ -214,6 +222,8 @@ public class MentirosoServidorApplication {
 			}
 			if (acusador != null) {
 				partida.getJugadores().remove(acusador);
+				// Reseteamos la jugada anterior
+				partida.setUltimaJugada(null);
 				cambioTurno(partida);
 			}
 			return "f";
@@ -222,6 +232,127 @@ public class MentirosoServidorApplication {
 	}
 
 	// MÉTODOS NO MAPPEADOS
+
+	private boolean jugadaValida(Jugada jugada, Jugada jugadaAnterior) {
+		int valor = 1;
+		HashMap<String, Integer> comprobarJugada = new HashMap<>();
+		while (valor <= 6) {
+			switch (valor) {
+			case 1:
+				comprobarJugada.put("Carta_alta", valor);
+				break;
+			case 2:
+				comprobarJugada.put("Pareja", valor);
+				break;
+			case 3:
+				comprobarJugada.put("Doble_pareja", valor);
+				break;
+			case 4:
+				comprobarJugada.put("Trío", valor);
+				break;
+			case 5:
+				comprobarJugada.put("Full_House", valor);
+				break;
+			case 6:
+				comprobarJugada.put("Póker", valor);
+				break;
+			}
+			valor++;
+		}
+		boolean respuesta = true;
+		System.err.println("JUGADA -> " + jugada.getValoresJugada().toString()); // PRUEBA -----------------------
+		if (jugadaAnterior == null) {
+			System.err.println("JUGADA ANTERIOR NULA"); // PRUEBA -----------------------------------------------------
+			respuesta = true;
+		} else {
+			System.err.println("JUGADA ANTERIOR -> " + jugadaAnterior.getValoresJugada().toString()); // PRUEBA
+																										// ---------------
+			int valorJugadaAnterior = 0;
+			int valorJugada = 0;
+			for (Map.Entry<String, Integer> entry : comprobarJugada.entrySet()) {
+				if (jugada.getTipoJugada().equals(entry.getKey()))
+					valorJugada = entry.getValue();
+				if (jugadaAnterior.getTipoJugada().equals(entry.getKey()))
+					valorJugadaAnterior = entry.getValue();
+			}
+			System.err.println("valorJugada = " + valorJugada); // PRUEBA ---------------------------------------------
+			System.err.println("valorJugadaAnterior = " + valorJugadaAnterior); // PRUEBA -----------
+			if (valorJugada > valorJugadaAnterior)
+				respuesta = true;
+			else if (valorJugada < valorJugadaAnterior)
+				respuesta = false;
+			else {
+				ArrayList<String> valoresCartasOrdenados = new ArrayList<>();
+				for (int i = 1; i <= 13; i++) {
+					switch (i) {
+					case 1:
+						valoresCartasOrdenados.add("2");
+						break;
+					case 2:
+						valoresCartasOrdenados.add("3");
+						break;
+					case 3:
+						valoresCartasOrdenados.add("4");
+						break;
+					case 4:
+						valoresCartasOrdenados.add("5");
+						break;
+					case 5:
+						valoresCartasOrdenados.add("6");
+						break;
+					case 6:
+						valoresCartasOrdenados.add("7");
+						break;
+					case 7:
+						valoresCartasOrdenados.add("8");
+						break;
+					case 8:
+						valoresCartasOrdenados.add("9");
+						break;
+					case 9:
+						valoresCartasOrdenados.add("10");
+						break;
+					case 10:
+						valoresCartasOrdenados.add("J");
+						break;
+					case 11:
+						valoresCartasOrdenados.add("Q");
+						break;
+					case 12:
+						valoresCartasOrdenados.add("K");
+						break;
+					case 13:
+						valoresCartasOrdenados.add("A");
+						break;
+					}
+				}
+				valorJugada = 0;
+				valorJugadaAnterior = 0;
+				for (String cartaJugada : jugada.getValoresJugada()) {
+					for (int j = 0; j < valoresCartasOrdenados.size(); j++) {
+						if (cartaJugada.equals(valoresCartasOrdenados.get(j))) {
+							valorJugada += j + 1;
+							j = valoresCartasOrdenados.size();
+						}
+					}
+				}
+
+				for (String cartaJugada : jugadaAnterior.getValoresJugada()) {
+					for (int j = 0; j < valoresCartasOrdenados.size(); j++) {
+						if (cartaJugada.equals(valoresCartasOrdenados.get(j))) {
+							valorJugadaAnterior += j + 1;
+							j = valoresCartasOrdenados.size();
+						}
+					}
+				}
+				System.err.println("valorJugada = " + valorJugada); // PRUEBA-----------
+				System.err.println("valorJugadaAnterior = " + valorJugadaAnterior); // PRUEBA-----------
+				if (valorJugada < valorJugadaAnterior)
+					respuesta = false;
+			}
+		}
+		return respuesta;
+	}
 
 	private void cambioTurno(Partida partida) {
 //		System.err.println("ID ACTUAL ANTES: " + partida.getIdActual()); // PRUEBA --------------------------
